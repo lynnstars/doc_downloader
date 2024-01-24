@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,7 +19,8 @@ def download(url):
     option.add_argument('headless')
     option.add_argument('log-level=3')
     option.add_argument("--window-size=1920,1080")
-    driver = webdriver.Chrome(executable_path='.//chromedriver', chrome_options=option)
+    service = Service(executable_path='.//chromedriver')
+    driver = webdriver.Chrome(service=service, options=option)
     title = "output"
     try:
         driver.set_page_load_timeout(15)
@@ -32,7 +34,7 @@ def download(url):
 
     try:
         # 展开全部
-        elem_cont_button = driver.find_element_by_id("continueButton")
+        elem_cont_button = driver.find_element(By.ID, "continueButton")
         driver.execute_script("arguments[0].scrollIntoView(true);", elem_cont_button)
         actions = ActionChains(driver)
         actions.move_to_element(elem_cont_button).perform()
@@ -42,14 +44,14 @@ def download(url):
         pass
 
     # 获取页数
-    num_of_pages = driver.find_element_by_id('toolbar').find_element_by_id('item-page-panel').\
-        find_element_by_class_name('text').text
+    num_of_pages = driver.find_element(By.ID, 'toolbar').find_element(By.ID, 'item-page-panel').\
+        find_element(By.CLASS_NAME, 'text').text
     num_of_pages = int(num_of_pages.split(' ')[-1])
     # print("页数：",num_of_pages)
 
     for i in range(5):
         # 缩放
-        driver.find_element_by_id('zoomInButton').click()
+        driver.find_element(By.ID, 'zoomInButton').click()
         time.sleep(0.5)
 
     if os.path.exists(f'./temp/{title}'):
@@ -63,10 +65,10 @@ def download(url):
         pagepb_id = "page_" + str(pages + 1)
 
         try:
-            element = driver.find_element_by_id(canvas_id)
+            element = driver.find_element(By.ID, canvas_id)
         except:
             time.sleep(1)
-            element = driver.find_element_by_id(canvas_id)
+            element = driver.find_element(By.ID, canvas_id)
 
         driver.execute_script("arguments[0].scrollIntoView(true);", element)
         actions = ActionChains(driver)
